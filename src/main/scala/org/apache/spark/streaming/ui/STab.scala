@@ -10,6 +10,14 @@ import STab._
 	* SparkUI。
 	*/
 private[spark] class STab(ssc: SContext) extends SparkUITab(getSparkUI(ssc), "流处理") with Logging{
+	logInfo("创建STab....")
+	def detach(): Unit = {
+		logInfo("将Streaming UITab从SparkUI上移除")
+	}
+
+	def attach(): Unit = {
+		logInfo("将Streaming UITab添加到SparkUI上")
+	}
 
 
 	//TODO 添加TASK CPU占比，编写CPU占比算法

@@ -19,7 +19,7 @@ class Checkpoint(ssc: SContext, val checkpointTime: Time) extends Logging with S
 	val jars  = ssc.sc.jars
 	val graph = ssc.graph
 	val checkpointDir = ssc.checkpointDir
-	val checkpointDuration = ssc.checkpointDuration
+	val checkpointDuration:Duration = ssc.checkpointDuration
 	val pendingTimes = ssc.scheduler.getPendingTimes().toArray
 	val delaySeconds = MetadataCleaner.getDelaySeconds(ssc.conf)
 	val sparkConfPairs = ssc.conf.getAll
@@ -388,7 +388,62 @@ private[streaming] class CheckpointWriter(
 	* Checkpoint实例。
 	*/
 private[streaming] object CheckpointReader extends Logging {
-	def read(path:String, conf:SparkConf, hadoopConf: Configuration):Option[Checkpoint] = {
-		throw new NotImplementedError("尚未实现")
+
+	/**
+		* 从指定checkpointDir目录恢复恢复最近一次的checkpoint状态，若
+		* 没有持久化的状态，则返回None。
+		*/
+	def read(checkpointDir: String):Option[Checkpoint] = {
+		read(checkpointDir, new SparkConf(), SparkHadoopUtil.get.conf, ignoreReadError = true)
+	}
+
+	/**
+		* 从指定checkpointDir目录恢复恢复最近一次的checkpoint状态，若
+		* 没有持久化的状态，则返回None。
+		* @param checkpointDir checkpoint文件所在目录
+		* @param conf          SparkConf
+		* @param hadoopConf    Configuration
+		* @param ignoreReadError true恢复状态过程中若出错，则抛出
+		*                        false恢复状态过程中若出错，则不会抛
+		*                        出直接返回None
+		* @return Option[Checkpoint]
+		*/
+	def read(
+						checkpointDir:String,
+						conf:SparkConf,
+						hadoopConf: Configuration,
+						ignoreReadError:Boolean = false):Option[Checkpoint] = {
+
+		val checkpointPath = new Path(checkpointDir)
+		//TODO(rein) 为什么要使用def而不是val？！
+		def fs:FileSystem = checkpointPath.getFileSystem(hadoopConf)
+
+		//所有的checkpoint文件，按照最近创建时间排序
+		val checkpointFiles =  Checkpoint.getChechkpointFiles(checkpointDir, Some(fs)).reverse
+		if(checkpointFiles.isEmpty) {
+			return None
+		}
+
+		logInfo(s"发现checkpoint文件(按照最近创建时间排序)：${checkpointFiles.mkString("\\n")}")
+
+		var readError:Exception = null
+		checkpointFiles.foreach{file =>
+			try {
+				val inputStream = fs.open(file)
+				val cp = Checkpoint.deserialize(inputStream, conf)
+				logInfo("成功从文checkpoint件读取并加载内容")
+				logInfo(s"恢复时采用的状态是: ${cp.checkpointTime}来自时刻的checkpoint状态")
+				return Some(cp)
+			}catch {
+				case e: Exception =>
+					readError = e
+					logWarning(s"读取checkpoint文件[${file}]进行反序列化过程中出错: ${e.getMessage}")
+			}
+		}
+
+		if (!ignoreReadError) {
+			throw new  Exception(s"从${checkpointDir}尝试恢复状态时失败，失败原因：${readError.getMessage}")
+		}
+		None
 	}
 }
