@@ -290,7 +290,7 @@ class SContext(sc_ : SparkContext, cp_ : Checkpoint, batchDuration_ : Duration) 
 		state match {
 			case INITIALIZING =>
 				startSite.set(DStream.getCreationSite())
-				logInfo(s"SContext CallSite值为：${startSite.get()}")
+				//logInfo(s"SContext CallSite值为：${startSite.get()}")
 				SContext.ACTIVATION_LOCK.synchronized{
 					SContext.assertNoOtherContextIsActive()
 					try {
@@ -329,6 +329,7 @@ class SContext(sc_ : SparkContext, cp_ : Checkpoint, batchDuration_ : Duration) 
 					* 一个Spark应用程序内部不允许有多个SparkContext。
 					*/
 				logWarning("SContext已经启动")
+
 			case   STOPPED =>
 				throw new IllegalStateException("SContext已经停止，无法" +
 					"被重用")

@@ -7,6 +7,9 @@ import org.apache.spark.ui.WebUIPage
 import scala.xml.Node
 
 class BatchPage(parent: STab) extends WebUIPage("batch") with Logging{
+	private val sJobListener = parent.listener
+	private val sparkListener = parent.ssc.sc.jobProgressListener
+
 	override def render(request: HttpServletRequest): Seq[Node] = {
 		logInfo("开始渲染Batch界面....")
 
