@@ -48,8 +48,8 @@ abstract class BaseBatchTable(tableId: String, batchInterval: Long) {
 	}
 
 	protected def baseRow(batchUIData: BatchUIData):Seq[Node] = {
-		val batchTime = batchUIData.batchTime
-		val formattedBatchTime = UIUtils.formatDuration(batchTime.milliseconds)
+		val batchTime = batchUIData.batchTime.milliseconds
+		val formattedBatchTime = UIUtils.formatDuration(batchTime)
 		val eventCount = batchUIData.numTotalRecords
 		val schedulingDelay = batchUIData.schedulingDelay
 		val processingDelay = batchUIData.processingDelay

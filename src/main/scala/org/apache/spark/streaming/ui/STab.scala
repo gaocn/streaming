@@ -69,8 +69,15 @@ private[spark] class STab(val ssc: SContext) extends SparkUITab(getSparkUI(ssc),
 		*
 		*	实现方式：Runtime.exec确定PID，然后用PS -ef确定CPU负载
 		*
+		* String name = ManagementFactory.getRuntimeMXBean().getName();
+		* // 25107@abc.mmm.xxx.yyy.com
+		* String pid = name.split("@")[0];
+		* //Pid is: 25107
+		* System.out.println("Pid is:" + pid);
 		*/
-
+		//the number of processors available to the Java virtual machine
+		//Runtime.getRuntime.availableProcessors()
+		//ssc.sc.jobProgressListener.activeStages.values.map(_.numTasks)
 
 
 }

@@ -66,9 +66,9 @@ class SPage(parent: STab) extends WebUIPage("") with Logging{
 		*/
 	private def generateBatchListTable():Seq[Node] = {
 
-		val runningBatches:Seq[BatchUIData] =  listener.runningBatches.map(b => BatchUIData(b)).sortBy(_.batchTime.milliseconds).reverse
-		val waitingBatches: Seq[BatchUIData] = listener.waitingBatches.map(b => BatchUIData(b)).sortBy(_.batchTime.milliseconds).reverse
-		val completedBatches: Seq[BatchUIData] =  listener.retainedCompletedBatches.map(b => BatchUIData(b)).sortBy(_.batchTime.milliseconds).reverse
+		val runningBatches:Seq[BatchUIData] =  listener.runningBatches
+		val waitingBatches: Seq[BatchUIData] = listener.waitingBatches
+		val completedBatches: Seq[BatchUIData] =  listener.retainedCompletedBatches
 
 		val activeBatchesContent =
 			<h4 id="active">

@@ -18,3 +18,8 @@ class JobScheduler(scontext: SContext) extends Logging{
 		logInfo("停止JobScheduler调度器....")
 	}
 }
+
+private[streaming] object JobScheduler {
+	val BATCH_TIME_PROPERTY_KEY = "spark.streaming.internal.batchTime"
+	val OUTPUT_OP_ID_PROPERTY_KEY = "spark.streaming.internal.outputOpId"
+}

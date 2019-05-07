@@ -20,7 +20,7 @@ case class BatchUIData(
 												val processingStartTime: Option[Long],
 												val processingEndTime: Option[Long],
 												val outputOperations: mutable.HashMap[OutputOpId, OutputOperationUIData] =  mutable.HashMap(),
-												val outputOpIdSparkJobIdPairs: Seq[OutputOperationIdAndSparkJobId] = Seq.empty
+												var outputOpIdSparkJobIdPairs: Seq[OutputOperationIdAndSparkJobId] = Seq.empty
 	) {
 
 	/**

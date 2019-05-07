@@ -4,6 +4,12 @@ import org.apache.spark.Logging
 import org.apache.spark.streaming.{Duration, SContext}
 
 final class DSGraph extends Serializable with Logging{
+	def getInputStreams() = ???
+
+	def getInputStreamName(streamId: Int): Option[String] = Some("test-streamid")
+
+	def getReceiverInputStreams() = Seq.empty
+
 	logInfo("创建DSGraph")
 
 	def validate(): Unit = {
