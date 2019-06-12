@@ -1,19 +1,23 @@
 package org.apache.spark.streaming
 
-import java.io.NotSerializableException
+import java.io.{InputStream, NotSerializableException}
 import java.util.concurrent.atomic.{AtomicInteger, AtomicReference}
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
 import org.apache.spark.deploy.SparkHadoopUtil
+import org.apache.spark.storage.StorageLevel
 import org.apache.spark.streaming.SContextState._
 import org.apache.spark.streaming.dstream.DStream
+import org.apache.spark.streaming.dstream.input.{ReceiverInputDStream, SocketInputDStream}
 import org.apache.spark.streaming.graph.DSGraph
 import org.apache.spark.streaming.scheduler.{JobScheduler, SListener}
 import org.apache.spark.streaming.source.SSource
 import org.apache.spark.streaming.ui.{SJobProgressListener, STab}
 import org.apache.spark.util._
-import org.apache.spark.{Logging, SparkConf, SparkContext};
+import org.apache.spark.{Logging, SparkConf, SparkContext}
+
+import scala.reflect.ClassTag;
 
 
 /**
@@ -96,7 +100,7 @@ class SContext(sc_ : SparkContext, cp_ : Checkpoint, batchDuration_ : Duration) 
 			"无法对SContext进行初始化！")
 	}
 
-	private val isCheckpointPresent =  (cp_ != null)
+	val isCheckpointPresent =  (cp_ != null)
 	private[streaming] val sc: SparkContext = {
 		if (sc_ != null) {
 			sc_
@@ -190,7 +194,7 @@ class SContext(sc_ : SparkContext, cp_ : Checkpoint, batchDuration_ : Duration) 
 
 	/**###############   SContext管理接口   #################*/
 
-	private def getStartSite():CallSite = startSite.get()
+	private[streaming] def getStartSite():CallSite = startSite.get()
 
 	/** 返回关联的Spark上下文 */
 	def sparkContext: SparkContext = sc
@@ -295,19 +299,16 @@ class SContext(sc_ : SparkContext, cp_ : Checkpoint, batchDuration_ : Duration) 
 					SContext.assertNoOtherContextIsActive()
 					try {
 						validate()
-						/**
-							*
-							*/
 						ThreadUtils.runInNewThread("SContext-Starting-Thread"){
-							sparkContext.setCallSite(startSite.get())
-							sparkContext.clearJobGroup()
-							sparkContext.setLocalProperty(SparkContext.SPARK_JOB_INTERRUPT_ON_CANCEL, "false")
+							sc.setCallSite(startSite.get())
+							sc.clearJobGroup()
+							sc.setLocalProperty(SparkContext.SPARK_JOB_INTERRUPT_ON_CANCEL, "false")
 							scheduler.start()
 						}
 						state = ACTIVE
 					} catch {
 						case e: Exception =>
-							logError(s"启动SContext是出错：${e.getMessage}")
+							logError(s"启动SContext时出错：${e.getMessage}")
 							scheduler.stop(false)
 							state = STOPPED
 							throw e
@@ -423,8 +424,31 @@ class SContext(sc_ : SparkContext, cp_ : Checkpoint, batchDuration_ : Duration) 
 		stop(false, stopGracefully)
 	}
 
+	/**
+		* Execute a block of code in a scope such that all new DStreams created in this body will
+		* be part of the same scope. For more detail, see the comments in `doCompute`.
+		*
+		* Note: Return statements are NOT allowed in the given body.
+		*/
+	private[streaming] def withScope[U](body: => U): U = sparkContext.withScope(body)
+
+
 
 	/**###############   DStream输入源接口   #################*/
+
+	/**
+		* 创建来自TCP的Socket输入流，接收数据为字节流，通过converter将
+		* 字节流转换为T类型的对象。
+		* @param host TCP主机名
+		* @param port TCP端口号
+		* @param converter 将字节流转换为对象
+		* @param storageLevel 存储级别
+		* @tparam T 输入数据类型
+		*/
+	def socketStream[T:ClassTag](host:String, port:Int, converter:(InputStream)=>	Iterator[T],storageLevel: StorageLevel):ReceiverInputDStream[T] = {
+		new SocketInputDStream[T](this, host, port, converter,storageLevel)
+	}
+
 
 
 }

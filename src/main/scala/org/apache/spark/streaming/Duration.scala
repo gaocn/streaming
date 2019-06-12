@@ -7,7 +7,6 @@ import org.apache.spark.util.Utils
 	*/
 private[streaming] case class Duration(private val millis: Long) {
 	def milliseconds: Long = millis
-	def ==(that: Duration): Boolean = this.millis == that.millis
 	def >(that: Duration): Boolean = this.millis > that.millis
 	def >=(that: Duration): Boolean = this.millis >= that.millis
 	def <(that: Duration): Boolean = this.millis < that.millis

@@ -43,5 +43,4 @@ class WindowDStream[T:ClassTag](parent: DStream[T], _windowDuration: Duration, _
 		}
 		Some(windowRDD)
 	}
-
 }

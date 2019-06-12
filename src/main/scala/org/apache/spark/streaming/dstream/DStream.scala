@@ -10,7 +10,7 @@ import org.apache.spark.util.{CallSite, MetadataCleaner}
 import org.apache.spark.streaming.SContextState.{ACTIVE, INITIALIZING, STOPPED}
 import org.apache.spark.streaming.graph.DSGraph
 import org.apache.spark.streaming.scheduler.Job
-import org.apache.spark.streaming.util.DateTimeUtilis
+import org.apache.spark.util.DateTimeUtilis
 import org.apache.spark.ui.UIUtils
 
 import scala.collection.mutable.HashMap
@@ -95,7 +95,7 @@ abstract class DStream[T:ClassTag](@transient var ssc: SContext) extends Seriali
 	protected[streaming] val baseScope:Option[String]= {
 		val scope = ssc.sc.getLocalProperty(SparkContext.RDD_SCOPE_KEY)
 		logInfo(s"当前DSteam实例${this}的baseScope为：${scope}")
-		Some(scope)
+		Option(scope)
 	}
 
 	private[streaming] def isInialized = (zeroTime != null)
@@ -208,12 +208,12 @@ abstract class DStream[T:ClassTag](@transient var ssc: SContext) extends Seriali
 		try {
 			if (displayInnerRDDOps) {
 				// Unset the short form call site, so that generated RDDs get their own
-				ssc.sparkContext.setLocalProperty(CallSite.SHORT_FORM, null)
-				ssc.sparkContext.setLocalProperty(CallSite.LONG_FORM, null)
+				ssc.sc.setLocalProperty(CallSite.SHORT_FORM, null)
+				ssc.sc.setLocalProperty(CallSite.LONG_FORM, null)
 			} else {
 				// Set the callsite, so that the generated RDDs get the DStream's call site and
 				// the internal RDD call sites do not get displayed
-				ssc.sparkContext.setCallSite(creationSite)
+				ssc.sc.setCallSite(creationSite)
 			}
 
 			// Use the DStream's base scope for this RDD so we can (1) preserve the higher level
@@ -488,7 +488,7 @@ abstract class DStream[T:ClassTag](@transient var ssc: SContext) extends Seriali
 		* CheckpointData中。DStream子类可以覆写该方法时同时需要覆写方法
 		* `updateCheckpointData()`。
 		*/
-	private[streamging] def restoreCheckpointData(): Unit = {
+	private[streaming] def restoreCheckpointData(): Unit = {
 		if(!restoredFromCheckpointData) {
 			logDebug("从CheckpointData中恢复保存的RDDs")
 			checkpointData.restore()
@@ -640,6 +640,7 @@ abstract class DStream[T:ClassTag](@transient var ssc: SContext) extends Seriali
 		*                       的整数倍。
 		* @param slideDuration  滑动窗口，必须为DStream的BatchInterval
 		*                       的整数倍。
+		* @return
 		*/
 	def window(windowDuration: Duration, slideDuration:Duration):DStream[T] = {
 		new WindowDStream(this, windowDuration,slideDuration)
@@ -661,7 +662,7 @@ abstract class DStream[T:ClassTag](@transient var ssc: SContext) extends Seriali
 		new ForEachDStream(this, context.sparkContext.clean(foreachFunc, false), displayInnerRDDOps).register()
 	}
 
-	def print():Unit = ssc.withScope(){
+	def print():Unit = ssc.withScope{
 		print(10)
 	}
 

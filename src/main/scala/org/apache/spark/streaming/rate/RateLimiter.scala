@@ -37,7 +37,7 @@ private[streaming] abstract class RateLimiter(conf:SparkConf) extends Logging{
 		* 设置限流速度为`newRate`，不能超过{{Long.MaxValue}}
 		* @param newRate 0或负数无效，新的限流速度
 		*/
-	def updateRate(newRate: Int):Unit =  {
+	def updateRate(newRate: Long):Unit =  {
 		if(newRate > 0) {
 			if(maxRateLimit > 0) {
 				rateLimiter.setRate(newRate.min(maxRateLimit))

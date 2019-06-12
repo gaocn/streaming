@@ -6,7 +6,7 @@ import org.apache.spark.Logging
 import org.apache.spark.streaming.Time
 import org.apache.spark.streaming.ui.SJobProgressListener.SparkJobId
 import org.apache.spark.streaming.ui.tables.BaseBatchTable
-import org.apache.spark.streaming.util.DateTimeUtilis
+import org.apache.spark.util.DateTimeUtilis
 import org.apache.spark.ui.jobs.UIData.JobUIData
 import org.apache.spark.ui.{UIUtils, WebUIPage}
 

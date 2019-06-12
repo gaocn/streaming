@@ -78,8 +78,6 @@ private[spark] class STab(val ssc: SContext) extends SparkUITab(getSparkUI(ssc),
 		//the number of processors available to the Java virtual machine
 		//Runtime.getRuntime.availableProcessors()
 		//ssc.sc.jobProgressListener.activeStages.values.map(_.numTasks)
-
-
 }
 
 object STab {

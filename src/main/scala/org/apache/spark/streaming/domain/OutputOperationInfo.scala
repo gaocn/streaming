@@ -2,7 +2,7 @@ package org.apache.spark.streaming.domain
 
 import org.apache.spark.streaming.Time
 
-case class OutputOperationInfo(
+private[streaming] case class OutputOperationInfo(
 		batchTime: Time,
 		id: Int,
 		name: String,

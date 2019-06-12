@@ -1,14 +1,14 @@
-package org.apache.spark.streaming.util
-
-import scala.xml.Node
-
-import org.apache.commons.lang3.StringEscapeUtils
+package org.apache.spark.util
 
 import java.text.SimpleDateFormat
 import java.util.TimeZone
 import java.util.concurrent.TimeUnit
 
-private[streaming] object DateTimeUtilis {
+import org.apache.commons.lang3.StringEscapeUtils
+
+import scala.xml.Node
+
+ object DateTimeUtilis {
 
 	/**
 		* Return the short string for a `TimeUnit`.

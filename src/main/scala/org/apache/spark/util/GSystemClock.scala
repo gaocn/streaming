@@ -1,7 +1,7 @@
 package org.apache.spark.util
 
 /**
-	* 时钟处理器，用于在测试时使用
+	* 时钟处理器，streaming中使用，参见[[org.apache.spark.streaming.receiver.BlockGenerator]]
 	*/
 trait GClock {
 	def getTimeMillis(): Long

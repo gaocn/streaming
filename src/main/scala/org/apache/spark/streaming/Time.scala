@@ -8,9 +8,6 @@ case class Time(private val millis: Long) {
 
 	def milliseconds: Long  = millis
 
-	//时间操作, DSL 实现
-	def ==(that: Time):Boolean = this.millis == that.millis
-
 	def >(that: Time):Boolean = this.millis > that.millis
 	def >=(that: Time):Boolean = this.millis >= that.millis
 

@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import org.apache.spark.Logging
 import org.apache.spark.util.AsynchronousListenerBus
 
-class SListenerBus extends AsynchronousListenerBus[SListener, SListenerEvent]("SListenerBus") with Logging{
+class SListenerBus extends AsynchronousListenerBus[SListener, SListenerEvent]("SListenerBus") with Logging {
 	logInfo("创建SListenerBus")
 
 	private val logDroppedEvent = new AtomicBoolean(false)
