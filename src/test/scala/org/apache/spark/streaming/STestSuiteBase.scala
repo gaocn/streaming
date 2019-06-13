@@ -40,10 +40,10 @@ trait STestSuiteBase extends SparkFunSuite with BeforeAndAfter with Logging{
 	def beforeFunction(): Unit = {
 		if (useManualClock) {
 			logInfo("使用manual clock时钟")
-			conf.set("spark.streaming.clock", "org.apache.spark.util.GManualClock")
+			conf.set("spark.streaming.clock", "GManualClock")
 		} else {
 			logInfo("使用real clock时钟")
-			conf.set("spark.streaming.clock", "org.apache.spark.util.GSystemClock")
+			conf.set("spark.streaming.clock", "GSystemClock")
 		}
 	}
 

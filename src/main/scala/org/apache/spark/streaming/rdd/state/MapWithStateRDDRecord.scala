@@ -79,6 +79,4 @@ object MapWithStateRDDRecord {
 
 		MapWithStateRDDRecord(newStateMap, mappedData)
 	}
-
-
 }
